@@ -18,22 +18,27 @@ class UtilsTest(ZulipTestCase):
         self.assertEqual(len(key), SIZE_KEY)
 
     def test_has_api_key_format_valid(self) -> None:
-        key = "a" * 32
+        SIZE_KEY = 32
+        key = "a" * SIZE_KEY
         
         self.assertTrue(has_api_key_format(key))
 
     def test_has_api_key_format_short(self) -> None:
-        key = "a" * 31
+        SIZE_KEY = 32
+        key = "a" * (SIZE_KEY - 1)
 
         self.assertFalse(has_api_key_format(key))
 
     def test_has_api_key_format_invalid_chars(self) -> None:
-        key = "a" * 31 + "-"
+        SIZE_KEY = 32
+        key = "a" * (SIZE_KEY - 1) + "-"
 
         self.assertFalse(has_api_key_format(key))
 
     def test_assert_is_not_none_valid(self) -> None:
-        self.assertEqual(assert_is_not_none("test"), "test")
+        VALUE = "test"
+
+        self.assertEqual(assert_is_not_none(VALUE), VALUE)
 
     def test_assert_is_not_none_invalid(self) -> None:
         with self.assertRaises(AssertionError):
@@ -79,10 +84,12 @@ class UtilsTest(ZulipTestCase):
 
     def test_sha256_hash_empty(self) -> None:
         EMPTY_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        EMPTY = ""
 
-        self.assertEqual(sha256_hash(""), EMPTY_HASH)
+        self.assertEqual(sha256_hash(EMPTY), EMPTY_HASH)
 
     def test_sha256_hash_value(self) -> None:
         HASH = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+        VALUE = "test"
         
-        self.assertEqual(sha256_hash("test"), HASH)
+        self.assertEqual(sha256_hash(VALUE), HASH)

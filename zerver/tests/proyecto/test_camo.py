@@ -8,29 +8,34 @@ from zerver.lib.camo import (
 class CamoTest(ZulipTestCase):
     def test_generate_camo_url(self) -> None:
         URL = "http://test.cr/img.png"
+        EXPECTED_PATH = "/"
 
         encoded_url = generate_camo_url(URL)
 
-        self.assertIn("/", encoded_url)
+        self.assertIn(EXPECTED_PATH, encoded_url)
 
     def test_get_camo_url_disabled(self) -> None:
         EMPTY_CAMO_URI = ""
+        URL = "http://test.cr"
 
         with self.settings(CAMO_URI=EMPTY_CAMO_URI):
-            self.assertEqual(get_camo_url("http://test.cr"), "http://test.cr")
+            self.assertEqual(get_camo_url(URL), URL)
 
     def test_get_camo_url_enabled(self) -> None:
         CAMO_URI = "https://camo.test.com/"
-        
+        URL = "http://test.cr"
+
         with self.settings(CAMO_URI=CAMO_URI):
-            encoded_url = get_camo_url("http://test.cr")
+            encoded_url = get_camo_url(URL)
 
             self.assertTrue(encoded_url.startswith(CAMO_URI))
 
     def test_is_camo_url_valid(self) -> None:
         URL = "http://test.cr/img.png"
+        EXPECTED_PATH = "/"
+        FIRST_CHAR = 0
 
         encoded_url = generate_camo_url(URL)
-        digest = encoded_url.split("/")[0]
+        digest = encoded_url.split(EXPECTED_PATH)[FIRST_CHAR]
 
         self.assertTrue(is_camo_url_valid(digest, URL))
