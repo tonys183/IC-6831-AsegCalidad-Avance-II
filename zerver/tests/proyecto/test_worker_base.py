@@ -5,7 +5,7 @@ from zerver.lib.test_classes import ZulipTestCase
 import zerver.worker.base as worker_base
 
 
-# Dummy para utilizar la cola
+# Made dummy class to use queue
 class DummyWorker(worker_base.QueueProcessingWorker):
     queue_name = "dummy_queue"
 
@@ -13,9 +13,8 @@ class DummyWorker(worker_base.QueueProcessingWorker):
         pass
 
 
-# Tests elaborados por Gael Ruiz
 
-# Test
+# test made by: Gael Ruiz
 class BaseTest(ZulipTestCase):
     def beforeEach(self) -> None:
         super().beforeEach()

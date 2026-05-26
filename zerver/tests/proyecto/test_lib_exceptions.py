@@ -11,9 +11,7 @@ from zerver.lib.exceptions import (
 )
 
 
-# Tests elaborados por Gael Ruiz
-
-# Test
+# test made by: Gael Ruiz
 class ExceptionsTest(ZulipTestCase):
     HTTP_STATUS_BAD_REQUEST = 400
     HTTP_STATUS_UNAUTHORIZED = 401

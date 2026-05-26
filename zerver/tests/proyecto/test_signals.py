@@ -4,10 +4,7 @@ from unittest import mock
 from zerver.lib.test_classes import ZulipTestCase
 import zerver.signals as signals
 
-
-# Tests elaborados por Gael Ruiz
-
-# Test
+# test made by: Gael Ruiz
 class SignalsTest(ZulipTestCase):
     PARSE_USER_AGENT_PATH = "zerver.signals.parse_user_agent"
     PARSE_OS_PATH = "zerver.signals.parse_os"
@@ -163,7 +160,7 @@ class SignalsTest(ZulipTestCase):
             self.ZOOM_PROVIDER,
             self.CLEARED_TOKEN_VALUE,
         )
-        
+
         mocked_set_token.assert_any_call(
             user,
             self.WEBEX_PROVIDER,
