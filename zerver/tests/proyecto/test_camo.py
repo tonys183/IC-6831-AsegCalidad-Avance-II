@@ -39,3 +39,9 @@ class CamoTest(ZulipTestCase):
         digest = encoded_url.split(EXPECTED_PATH)[FIRST_CHAR]
 
         self.assertTrue(is_camo_url_valid(digest, URL))
+
+    def test_is_camo_url_invalid(self) -> None:
+        URL = "http://test.cr/img.png"
+        bad_digest = "1234567890abcdef"
+
+        self.assertFalse(is_camo_url_valid(bad_digest, URL))

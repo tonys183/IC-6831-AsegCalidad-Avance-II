@@ -8,7 +8,6 @@ from zerver.lib.exceptions import (
     UnauthorizedError,
 )
 
-
 # test made by: Gael Ruiz
 class ExceptionsTest(ZulipTestCase):
     HTTP_STATUS_BAD_REQUEST = 400

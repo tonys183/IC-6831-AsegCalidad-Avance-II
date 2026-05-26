@@ -2,14 +2,12 @@ import zerver.worker.base as worker_base
 from typing import Any
 from zerver.lib.test_classes import ZulipTestCase
 
-
 # Made dummy class to use queue
 class DummyWorker(worker_base.QueueProcessingWorker):
     queue_name = "dummy_queue"
 
     def consume(self, data: dict[str, Any]) -> None:
-        return None
-        
+        return None    
 
 # test made by: Gael Ruiz
 class BaseTest(ZulipTestCase):

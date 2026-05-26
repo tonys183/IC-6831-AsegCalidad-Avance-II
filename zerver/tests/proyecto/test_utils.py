@@ -1,4 +1,5 @@
 from zerver.lib.test_classes import ZulipTestCase
+from zerver.models import UserProfile, Realm, Stream, Client
 from zerver.lib.utils import (
     generate_api_key,
     has_api_key_format,
@@ -6,6 +7,7 @@ from zerver.lib.utils import (
     process_list_in_batches,
     optional_bytes_to_mib,
     sha256_hash,
+    get_fk_field_name
 )
 
 # test made by: Anthony Segura Paniagua
@@ -93,3 +95,11 @@ class UtilsTest(ZulipTestCase):
         VALUE = "test"
         
         self.assertEqual(sha256_hash(VALUE), HASH)
+
+    def test_get_fk_field_name(self) -> None:
+        REALM_FIELD_NAME = "realm"
+        
+        self.assertEqual(get_fk_field_name(UserProfile, Realm), REALM_FIELD_NAME)
+        self.assertIsNone(get_fk_field_name(Client, Realm))
+        with self.assertRaises(AssertionError):
+            get_fk_field_name(Realm, Stream)
