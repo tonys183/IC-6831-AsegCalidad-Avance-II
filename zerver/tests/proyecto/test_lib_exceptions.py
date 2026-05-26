@@ -1,7 +1,5 @@
 from typing import Any
-
 from zerver.lib.test_classes import ZulipTestCase
-
 from zerver.lib.exceptions import (
     CannotDeactivateLastUserError,
     DirectMessagePermissionError,

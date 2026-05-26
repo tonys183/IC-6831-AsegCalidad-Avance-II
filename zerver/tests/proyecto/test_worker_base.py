@@ -1,8 +1,6 @@
-from typing import Any
-
-from zerver.lib.test_classes import ZulipTestCase
-
 import zerver.worker.base as worker_base
+from typing import Any
+from zerver.lib.test_classes import ZulipTestCase
 
 
 # Made dummy class to use queue
@@ -11,8 +9,7 @@ class DummyWorker(worker_base.QueueProcessingWorker):
 
     def consume(self, data: dict[str, Any]) -> None:
         pass
-
-
+        
 
 # test made by: Gael Ruiz
 class BaseTest(ZulipTestCase):

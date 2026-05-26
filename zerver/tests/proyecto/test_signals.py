@@ -1,8 +1,7 @@
+import zerver.signals as signals
 from types import SimpleNamespace
 from unittest import mock
-
 from zerver.lib.test_classes import ZulipTestCase
-import zerver.signals as signals
 
 # test made by: Gael Ruiz
 class SignalsTest(ZulipTestCase):
