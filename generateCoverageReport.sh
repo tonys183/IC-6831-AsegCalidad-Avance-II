@@ -11,9 +11,9 @@ FILES=("$PATH_LIB/camo.py" "$PATH_LIB/emoji_utils.py" "$PATH_LIB/mime_types.py" 
 )
 FILES_JOINED=$(IFS=,; echo "${FILES[*]}")
 
-echo -e "Generando reporte de cobertura...\n"
+echo -e "Generating coverage report...\n"
 ./tools/test-backend $PATH_TESTS --coverage --no-cov-cleanup
 coverage html --data-file=$FILE_COVERAGE --include="$FILES_JOINED" -d $PATH_OUT
 
-echo -e "\nReporte guardado en ${PATH_OUT}index.html"
+echo -e "\nCoverage report saved in ${PATH_OUT}index.html"
 explorer.exe $(wslpath -w $PATH_OUT/index.html) 2>/dev/null
