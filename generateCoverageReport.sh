@@ -3,11 +3,15 @@
 PATH_TESTS="zerver/tests/proyecto/"
 PATH_LIB="zerver/lib/"
 PATH_WORKER="zerver/worker/"
+PATH_MARKDOWN="zerver/lib/markdown/"
+PATH_ACTIONS="zerver/actions/"
 PATH_OUT="var/coverage/proyecto/"
 FILE_COVERAGE="var/.coverage"
-FILES=("$PATH_LIB/camo.py" "$PATH_LIB/emoji_utils.py" "$PATH_LIB/mime_types.py" "$PATH_LIB/name_restrictions.py"
-       "$PATH_LIB/utils.py" "$PATH_WORKER/base.py" "$PATH_LIB/exceptions.py" "$PATH_LIB/signals.py"
-       "$PATH_TESTS*"
+FILES=("$PATH_LIB/camo.py" "$PATH_LIB/emoji_utils.py" "$PATH_LIB/mimex_types.py"
+"$PATH_LIB/name_restrictions.py" "$PATH_LIB/utils.py" "$PATH_WORKER/base.py"
+"$PATH_LIB/exceptions.py" "$PATH_LIB/signals.py" "$PATH_ACTIONS/realm_icon.py" 
+"$PATH_MARKDOWN/nested_code_blocks.py" "$PATH_LIB/string_validation.py" 
+"$PATH_LIB/widget.py" "$PATH_TESTS*"
 )
 FILES_JOINED=$(IFS=,; echo "${FILES[*]}")
 
