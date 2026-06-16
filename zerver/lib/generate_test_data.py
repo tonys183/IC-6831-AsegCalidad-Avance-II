@@ -2,6 +2,7 @@ import itertools
 import os
 import random
 from typing import Any
+from pathlib import Path
 
 import orjson
 
@@ -10,10 +11,16 @@ from zerver.lib.topic import RESOLVED_TOPIC_PREFIX
 
 
 def load_config() -> dict[str, Any]:
-    with open("zerver/tests/fixtures/config.generate_data.json", "rb") as infile:
-        config = orjson.loads(infile.read())
+    config_file = (
+        Path(__file__).resolve().parent.parent
+        / "tests"
+        / "zulip"
+        / "fixtures"
+        / "config.generate_data.json"
+    )
 
-    return config
+    with open(config_file, "rb") as infile:
+        return orjson.loads(infile.read())
 
 
 def generate_topics(num_topics: int) -> list[str]:
