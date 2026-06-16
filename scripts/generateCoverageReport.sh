@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")/.."
 
 PATH_TESTS="zerver/tests/proyecto/"
 PATH_LIB="zerver/lib/"
