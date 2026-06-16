@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 import * as z from "zod/mini";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 const email = "alice@test.example.com";
 const organization_name = "Awesome Organization";
@@ -37,8 +37,8 @@ async function realm_creation_tests(page: Page): Promise<void> {
     // Open the confirmation URL
     const page_content = await page.evaluate(() => document.querySelector("body")!.textContent);
     assert.ok(page_content !== null);
-    const {confirmation_key} = z
-        .object({confirmation_key: z.string()})
+    const { confirmation_key } = z
+        .object({ confirmation_key: z.string() })
         .parse(JSON.parse(page_content));
     const confirmation_url = `http://${host}/accounts/do_confirm/${confirmation_key}`;
     await page.goto(confirmation_url);
@@ -49,7 +49,7 @@ async function realm_creation_tests(page: Page): Promise<void> {
     // first input is focused when we are typing something for other fields causing
     // validation errors. The code for focusing the input is wrapped in jQuery
     // $() calls which runs when DOMContentLoaded is fired.
-    await page.waitForNavigation({waitUntil: "domcontentloaded"});
+    await page.waitForNavigation({ waitUntil: "domcontentloaded" });
 
     // Make sure the realm creation page is loaded correctly by
     // checking the text in <p> tag under pitch class is as expected.

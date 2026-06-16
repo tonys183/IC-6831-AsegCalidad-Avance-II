@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 // This will be the row of the custom profile field we add.
 const profile_field_row = "#admin_profile_fields_table tr:nth-last-child(1)";
@@ -18,7 +18,7 @@ async function test_add_new_profile_field(page: Page): Promise<void> {
         await common.get_text_from_selector(page, ".micromodal .dialog_submit_button"),
         "Add",
     );
-    await page.waitForSelector(".admin-profile-field-form", {visible: true});
+    await page.waitForSelector(".admin-profile-field-form", { visible: true });
     await common.fill_form(page, "form.admin-profile-field-form", {
         field_type: "1",
         name: "Teams",
@@ -75,7 +75,7 @@ async function test_delete_custom_profile_field(page: Page): Promise<void> {
     await page.click(".micromodal .dialog_submit_button");
     await common.wait_for_micromodal_to_close(page);
 
-    await page.waitForSelector("#admin-profile-field-status img", {visible: true});
+    await page.waitForSelector("#admin-profile-field-status img", { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(page, "div#admin-profile-field-status"),
         "Saved",

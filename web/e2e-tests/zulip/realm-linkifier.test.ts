@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function test_add_linkifier(page: Page): Promise<void> {
-    await page.waitForSelector("#add-linkifier-button", {visible: true});
+    await page.waitForSelector("#add-linkifier-button", { visible: true });
     await page.click("#add-linkifier-button");
     await common.wait_for_micromodal_to_open(page);
-    await page.waitForSelector("form.linkifier-add-form", {visible: true});
+    await page.waitForSelector("form.linkifier-add-form", { visible: true });
     await common.fill_form(page, "form.linkifier-add-form", {
         pattern: "#(?P<id>[0-9]+)",
         url_template: "https://trac.example.com/ticket/{id}",
@@ -17,14 +17,14 @@ async function test_add_linkifier(page: Page): Promise<void> {
     await common.wait_for_micromodal_to_close(page);
 
     const admin_linkifier_status_selector = "div#linkifier-field-status";
-    await page.waitForSelector(admin_linkifier_status_selector, {visible: true});
+    await page.waitForSelector(admin_linkifier_status_selector, { visible: true });
     const admin_linkifier_status = await common.get_text_from_selector(
         page,
         admin_linkifier_status_selector,
     );
     assert.strictEqual(admin_linkifier_status, "Custom linkifier added!");
 
-    await page.waitForSelector(".linkifier_row:nth-child(4)", {visible: true});
+    await page.waitForSelector(".linkifier_row:nth-child(4)", { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(
             page,
@@ -53,7 +53,7 @@ async function test_delete_linkifier(page: Page): Promise<void> {
 async function test_add_invalid_linkifier_pattern(page: Page): Promise<void> {
     await page.click("#add-linkifier-button");
     await common.wait_for_micromodal_to_open(page);
-    await page.waitForSelector("form.linkifier-add-form", {visible: true});
+    await page.waitForSelector("form.linkifier-add-form", { visible: true });
     await common.fill_form(page, "form.linkifier-add-form", {
         pattern: "(foo",
         url_template: "https://trac.example.com/ticket/{id}",
@@ -63,7 +63,7 @@ async function test_add_invalid_linkifier_pattern(page: Page): Promise<void> {
     // Invalid patterns are rejected client-side by RE2JS compilation before
     // the form is submitted; the error appears in the pattern-specific status
     // element and includes RE2JS's description of the compilation failure.
-    await page.waitForSelector("div#linkifier-pattern-status", {visible: true});
+    await page.waitForSelector("div#linkifier-pattern-status", { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(page, "div#linkifier-pattern-status"),
         "Failed: Bad regular expression: missing closing )",
@@ -74,7 +74,7 @@ async function test_add_invalid_linkifier_pattern(page: Page): Promise<void> {
 }
 
 async function test_edit_linkifier(page: Page): Promise<void> {
-    await page.waitForSelector(".linkifier_row:nth-last-child(1) .edit", {visible: true});
+    await page.waitForSelector(".linkifier_row:nth-last-child(1) .edit", { visible: true });
     await page.click(".linkifier_row:nth-last-child(1) .edit");
     await common.wait_for_micromodal_to_open(page);
     await common.fill_form(page, "form.linkifier-edit-form", {
@@ -83,10 +83,10 @@ async function test_edit_linkifier(page: Page): Promise<void> {
     });
     await page.click(".dialog_submit_button");
 
-    await page.waitForSelector(".micromodal", {hidden: true});
+    await page.waitForSelector(".micromodal", { hidden: true });
     await common.wait_for_micromodal_to_close(page);
 
-    await page.waitForSelector(".linkifier_row:nth-last-child(1)", {visible: true});
+    await page.waitForSelector(".linkifier_row:nth-last-child(1)", { visible: true });
     await page.waitForFunction(
         () =>
             document.querySelector(".linkifier_row:nth-last-child(1) span.linkifier_pattern")
@@ -102,7 +102,7 @@ async function test_edit_linkifier(page: Page): Promise<void> {
 }
 
 async function test_edit_invalid_linkifier(page: Page): Promise<void> {
-    await page.waitForSelector(".linkifier_row:nth-last-child(1) .edit", {visible: true});
+    await page.waitForSelector(".linkifier_row:nth-last-child(1) .edit", { visible: true });
     await page.click(".linkifier_row:nth-last-child(1) .edit");
     await common.wait_for_micromodal_to_open(page);
     await common.fill_form(page, "form.linkifier-edit-form", {
@@ -114,7 +114,7 @@ async function test_edit_invalid_linkifier(page: Page): Promise<void> {
     // Invalid patterns are rejected client-side by RE2JS, so the form
     // does not submit and the URL template is never checked server-side.
     const edit_linkifier_pattern_status_selector = "div#linkifier-pattern-status";
-    await page.waitForSelector(edit_linkifier_pattern_status_selector, {visible: true});
+    await page.waitForSelector(edit_linkifier_pattern_status_selector, { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(page, edit_linkifier_pattern_status_selector),
         "Failed: Bad regular expression: invalid nested repetition operator",
@@ -127,7 +127,7 @@ async function test_edit_invalid_linkifier(page: Page): Promise<void> {
     await page.click(".dialog_submit_button");
 
     const edit_linkifier_template_status_selector = "div#linkifier-template-status";
-    await page.waitForSelector(edit_linkifier_template_status_selector, {visible: true});
+    await page.waitForSelector(edit_linkifier_template_status_selector, { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(page, edit_linkifier_template_status_selector),
         "Failed: Invalid URL template.",
@@ -136,7 +136,7 @@ async function test_edit_invalid_linkifier(page: Page): Promise<void> {
     await page.click(".dialog_exit_button");
     await common.wait_for_micromodal_to_close(page);
 
-    await page.waitForSelector(".linkifier_row:nth-last-child(1)", {visible: true});
+    await page.waitForSelector(".linkifier_row:nth-last-child(1)", { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(
             page,

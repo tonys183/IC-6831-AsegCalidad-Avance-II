@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 const stream_name = "Verona";
 const topic_name = "near-read-test";
@@ -16,20 +16,20 @@ async function get_stream_id(page: Page): Promise<number> {
 
 async function navigate_to_settings_preferences(page: Page): Promise<void> {
     await common.open_personal_menu(page);
-    await page.waitForSelector("#personal-menu-dropdown a[href^='#settings']", {visible: true});
+    await page.waitForSelector("#personal-menu-dropdown a[href^='#settings']", { visible: true });
     await page.click("#personal-menu-dropdown a[href^='#settings']");
-    await page.waitForSelector("#settings_overlay_container.show", {visible: true});
-    await page.waitForSelector('[data-section="preferences"]', {visible: true});
+    await page.waitForSelector("#settings_overlay_container.show", { visible: true });
+    await page.waitForSelector('[data-section="preferences"]', { visible: true });
     await page.click('[data-section="preferences"]');
-    await page.waitForSelector("#user_web_mark_read_on_scroll_policy", {visible: true});
+    await page.waitForSelector("#user_web_mark_read_on_scroll_policy", { visible: true });
 }
 
 async function change_mark_read_policy(page: Page, value: string): Promise<void> {
     await navigate_to_settings_preferences(page);
     await page.select("#user_web_mark_read_on_scroll_policy", value);
-    await page.waitForSelector("#user-preferences .general-settings-status", {visible: true});
+    await page.waitForSelector("#user-preferences .general-settings-status", { visible: true });
     await page.click("#settings_page .content-wrapper .exit");
-    await page.waitForSelector("#settings_overlay_container", {hidden: true});
+    await page.waitForSelector("#settings_overlay_container", { hidden: true });
 }
 
 // Test 1: A /near/ narrow is treated as a conversation view.
@@ -93,7 +93,7 @@ async function test_near_narrow_reading_gate_clears(page: Page): Promise<void> {
     // and resuming reading via resume_reading().
     await page.waitForFunction(
         () => zulip_test.current_msg_list?.near_view_reading_gate_pending === false,
-        {timeout: 5000},
+        { timeout: 5000 },
     );
     const reading_prevented = await page.evaluate(
         () => zulip_test.current_msg_list?.reading_prevented,
@@ -129,7 +129,7 @@ async function test_near_narrow_no_conversation_only_banner(page: Page): Promise
             (
                 document.querySelector("#mark_as_read_turned_off_content")?.textContent ?? ""
             ).includes("conversation"),
-        {timeout: 5000},
+        { timeout: 5000 },
     );
     const channel_banner_text = await page.$eval(
         "#mark_as_read_turned_off_content",
@@ -151,7 +151,7 @@ async function test_near_narrow_no_conversation_only_banner(page: Page): Promise
     // maybe_resume_reading_for_near_view fires the not_found path).
     await page.waitForFunction(
         () => zulip_test.current_msg_list?.near_view_reading_gate_pending === false,
-        {timeout: 5000},
+        { timeout: 5000 },
     );
 
     const near_banner_text = await page.$eval(
@@ -178,7 +178,7 @@ async function test_near_narrow_gate_requires_scroll(page: Page): Promise<void> 
     // Send 15 messages so that, when anchored at the last one, the first
     // message is well above the viewport and the gate cannot clear until
     // the user scrolls back to the top.
-    const msgs = Array.from({length: 15}, (_, i) => ({
+    const msgs = Array.from({ length: 15 }, (_, i) => ({
         stream_name,
         topic: gate_topic,
         content: `gate test message ${i + 1}`,
@@ -203,7 +203,7 @@ async function test_near_narrow_gate_requires_scroll(page: Page): Promise<void> 
     // Wait for the client's unread state to reflect the server's response.
     await page.waitForFunction(
         (sid: number, topic: string) => zulip_test.num_unread_for_topic(sid, topic) > 0,
-        {timeout: 10000},
+        { timeout: 10000 },
         stream_id,
         gate_topic,
     );
@@ -244,7 +244,7 @@ async function test_near_narrow_gate_requires_scroll(page: Page): Promise<void> 
     // The gate should now clear since the first unread is visible.
     await page.waitForFunction(
         () => zulip_test.current_msg_list?.near_view_reading_gate_pending === false,
-        {timeout: 5000},
+        { timeout: 5000 },
     );
     reading_prevented = await page.evaluate(() => zulip_test.current_msg_list?.reading_prevented);
     assert.equal(

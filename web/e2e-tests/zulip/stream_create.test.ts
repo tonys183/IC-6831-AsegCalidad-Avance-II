@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function user_row_selector(page: Page, name: string): Promise<string> {
     const user_id = await common.get_user_id_from_name(page, name);
@@ -12,12 +12,12 @@ async function user_row_selector(page: Page, name: string): Promise<string> {
 
 async function await_user_visible(page: Page, name: string): Promise<void> {
     const selector = await user_row_selector(page, name);
-    await page.waitForSelector(selector, {visible: true});
+    await page.waitForSelector(selector, { visible: true });
 }
 
 async function await_user_hidden(page: Page, name: string): Promise<void> {
     const selector = await user_row_selector(page, name);
-    await page.waitForSelector(selector, {hidden: true});
+    await page.waitForSelector(selector, { hidden: true });
 }
 
 async function add_user_to_stream(page: Page, name: string): Promise<void> {
@@ -30,7 +30,7 @@ async function add_user_to_stream(page: Page, name: string): Promise<void> {
 }
 
 async function stream_name_error(page: Page): Promise<string> {
-    await page.waitForSelector("#stream_name_error", {visible: true});
+    await page.waitForSelector("#stream_name_error", { visible: true });
     return await common.get_text_from_selector(page, "#stream_name_error");
 }
 
@@ -38,7 +38,7 @@ async function click_create_new_stream(page: Page): Promise<void> {
     await page.click("#add_new_subscription .create_stream_button");
     await page.type("#create_stream_name", "Test Stream 1");
     await page.click("#stream_creation_go_to_subscribers");
-    await page.waitForSelector(".finalize_create_stream", {visible: true});
+    await page.waitForSelector(".finalize_create_stream", { visible: true });
 
     // sanity check that desdemona is the initial subsscriber
     await await_user_visible(page, "desdemona");
@@ -51,15 +51,15 @@ async function clear_ot_filter_with_backspace(page: Page): Promise<void> {
 }
 
 async function test_user_filter_ui(page: Page): Promise<void> {
-    await page.waitForSelector("form#stream_creation_form", {visible: true});
+    await page.waitForSelector("form#stream_creation_form", { visible: true });
     // Desdemona should be there by default
     await await_user_visible(page, "desdemona");
 
     await add_user_to_stream(page, common.fullname.cordelia);
     await add_user_to_stream(page, common.fullname.othello);
 
-    await page.type(`form#stream_creation_form [name="user_list_filter"]`, "ot", {delay: 100});
-    await page.waitForSelector("#create_stream_subscribers", {visible: true});
+    await page.type(`form#stream_creation_form [name="user_list_filter"]`, "ot", { delay: 100 });
+    await page.waitForSelector("#create_stream_subscribers", { visible: true });
     // Wait until filtering is completed.
     await page.waitForFunction(
         () =>
@@ -94,7 +94,7 @@ async function create_stream(page: Page): Promise<void> {
     await page.click("form#stream_creation_form .finalize_create_stream");
 
     // We redirect to the channel message view.
-    await page.waitForSelector("#subscription_overlay", {hidden: true});
+    await page.waitForSelector("#subscription_overlay", { hidden: true });
     await page.waitForSelector(
         `xpath///*[${common.has_class_x("message-header-navbar-title")} and text()="Puppeteer"]`,
     );
@@ -104,7 +104,7 @@ async function create_stream(page: Page): Promise<void> {
     await page.waitForSelector(".stream_section");
     await page.waitForSelector(
         `xpath///*[${common.has_class_x("stream-name-title")} and text()="Puppeteer"]`,
-        {visible: true},
+        { visible: true },
     );
     const stream_name = await common.get_text_from_selector(
         page,
@@ -127,14 +127,14 @@ async function create_stream(page: Page): Promise<void> {
 
 async function test_streams_with_empty_names_cannot_be_created(page: Page): Promise<void> {
     await page.click("#add_new_subscription .create_stream_button");
-    await page.waitForSelector("form#stream_creation_form", {visible: true});
-    await common.fill_form(page, "form#stream_creation_form", {stream_name: "  "});
+    await page.waitForSelector("form#stream_creation_form", { visible: true });
+    await common.fill_form(page, "form#stream_creation_form", { stream_name: "  " });
     await page.click("form#stream_creation_form button#stream_creation_go_to_subscribers");
     assert.strictEqual(await stream_name_error(page), "Choose a name for the new channel.");
 }
 
 async function test_streams_with_duplicate_names_cannot_be_created(page: Page): Promise<void> {
-    await common.fill_form(page, "form#stream_creation_form", {stream_name: "Puppeteer"});
+    await common.fill_form(page, "form#stream_creation_form", { stream_name: "Puppeteer" });
     await page.click("form#stream_creation_form button#stream_creation_go_to_subscribers");
     assert.strictEqual(await stream_name_error(page), "A channel with this name already exists.");
 
@@ -166,7 +166,7 @@ async function test_streams_search_feature(page: Page): Promise<void> {
     );
 
     await page.type('#stream_filter input[type="text"]', "Puppeteer");
-    await page.waitForSelector(".stream-row[data-stream-name='core team']", {hidden: true});
+    await page.waitForSelector(".stream-row[data-stream-name='core team']", { hidden: true });
     assert.strictEqual(
         await common.get_text_from_selector(page, ".stream-row:not(.notdisplayed) .stream-name"),
         "Puppeteer",

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 const message = "test star";
 
@@ -17,12 +17,12 @@ async function toggle_test_star_message(page: Page): Promise<void> {
         )} and normalize-space()="${message}"])[last()]/ancestor::*[${common.has_class_x(
             "messagebox",
         )}]`,
-        {visible: true},
+        { visible: true },
     );
     assert.ok(messagebox !== null);
     await messagebox.hover();
 
-    const star_icon = await messagebox.waitForSelector(".star", {visible: true});
+    const star_icon = await messagebox.waitForSelector(".star", { visible: true });
     assert.ok(star_icon !== null);
     await star_icon.click();
 }
@@ -37,7 +37,7 @@ async function test_narrow_to_starred_messages(page: Page): Promise<void> {
     const combined_feed_id = await common.get_current_msg_list_id(page, true);
     await page.waitForSelector(
         `.message-list[data-message-list-id='${combined_feed_id}'] .message_row`,
-        {visible: true},
+        { visible: true },
     );
 }
 
@@ -47,7 +47,7 @@ async function stars_test(page: Page): Promise<void> {
     let message_list_id = await common.get_current_msg_list_id(page, true);
     await page.waitForSelector(
         `.message-list[data-message-list-id='${message_list_id}'] .message_row`,
-        {visible: true},
+        { visible: true },
     );
     // Assert that there is only one message list.
     assert.equal((await page.$$(".message-list")).length, 1);
@@ -64,7 +64,7 @@ async function stars_test(page: Page): Promise<void> {
     message_list_id = await common.get_current_msg_list_id(page, true);
     await page.waitForSelector(
         `.message-list[data-message-list-id='${message_list_id}'] .zulip-icon-star-filled`,
-        {visible: true},
+        { visible: true },
     );
     assert.strictEqual(
         await stars_count(page),

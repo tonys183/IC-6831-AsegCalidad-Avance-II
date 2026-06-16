@@ -1,10 +1,10 @@
-import type {ElementHandle, Page} from "puppeteer";
+import type { ElementHandle, Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function test_subscription_button(page: Page): Promise<void> {
     const all_stream_selector = "[data-tab-key='all-streams']";
-    await page.waitForSelector(all_stream_selector, {visible: true});
+    await page.waitForSelector(all_stream_selector, { visible: true });
     await page.click(all_stream_selector);
     const stream_selector = "[data-stream-name='Venice']";
     const button_selector = `${stream_selector} .sub_unsub_button`;
@@ -16,9 +16,9 @@ async function test_subscription_button(page: Page): Promise<void> {
             `xpath///*[${common.has_class_x("stream-info-title")}]//*[${common.has_class_x(
                 "sub_unsub_button",
             )} and normalize-space()="Unsubscribe"]`,
-            {visible: true},
+            { visible: true },
         );
-        return await page.waitForSelector(subscribed_selector, {visible: true});
+        return await page.waitForSelector(subscribed_selector, { visible: true });
     }
 
     async function unsubscribed(): Promise<ElementHandle | null> {
@@ -26,14 +26,14 @@ async function test_subscription_button(page: Page): Promise<void> {
             `xpath///*[${common.has_class_x("stream-info-title")}]//*[${common.has_class_x(
                 "sub_unsub_button",
             )} and normalize-space()="Subscribe"]`,
-            {visible: true},
+            { visible: true },
         );
-        return await page.waitForSelector(unsubscribed_selector, {visible: true});
+        return await page.waitForSelector(unsubscribed_selector, { visible: true });
     }
 
     // Make sure that Venice is even in our list of streams.
-    await page.waitForSelector(stream_selector, {visible: true});
-    await page.waitForSelector(button_selector, {visible: true});
+    await page.waitForSelector(stream_selector, { visible: true });
+    await page.waitForSelector(button_selector, { visible: true });
 
     await page.click(stream_selector);
 

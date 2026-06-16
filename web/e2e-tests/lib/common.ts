@@ -82,7 +82,7 @@ export async function ensure_browser(): Promise<Browser> {
         // TODO: Change defaultViewport to 1280x1024 when puppeteer fixes the window size issue with firefox.
         // Here is link to the issue that is tracking the above problem https://github.com/puppeteer/puppeteer/issues/6442.
         defaultViewport: null,
-        headless: true,
+        headless: process.env.HEADLESS !== "false",
     });
     return browser;
 }

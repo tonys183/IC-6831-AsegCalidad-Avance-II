@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function copy_messages(
     page: Page,
@@ -128,19 +128,19 @@ async function test_copying_messages_from_several_topics(page: Page): Promise<vo
 async function copy_paste_test(page: Page): Promise<void> {
     await common.log_in(page);
     await common.send_multiple_messages(page, [
-        {stream_name: "Verona", topic: "copy-paste-topic #1", content: "copy paste test A"},
+        { stream_name: "Verona", topic: "copy-paste-topic #1", content: "copy paste test A" },
 
-        {stream_name: "Verona", topic: "copy-paste-topic #1", content: "copy paste test B"},
+        { stream_name: "Verona", topic: "copy-paste-topic #1", content: "copy paste test B" },
 
-        {stream_name: "Verona", topic: "copy-paste-topic #2", content: "copy paste test C"},
+        { stream_name: "Verona", topic: "copy-paste-topic #2", content: "copy paste test C" },
 
-        {stream_name: "Verona", topic: "copy-paste-topic #2", content: "copy paste test D"},
+        { stream_name: "Verona", topic: "copy-paste-topic #2", content: "copy paste test D" },
 
-        {stream_name: "Verona", topic: "copy-paste-topic #2", content: "copy paste test E"},
+        { stream_name: "Verona", topic: "copy-paste-topic #2", content: "copy paste test E" },
 
-        {stream_name: "Verona", topic: "copy-paste-topic #3", content: "copy paste test F"},
+        { stream_name: "Verona", topic: "copy-paste-topic #3", content: "copy paste test F" },
 
-        {stream_name: "Verona", topic: "copy-paste-topic #3", content: "copy paste test G"},
+        { stream_name: "Verona", topic: "copy-paste-topic #3", content: "copy paste test G" },
     ]);
 
     await page.click("#left-sidebar-navigation-list .top_left_all_messages");

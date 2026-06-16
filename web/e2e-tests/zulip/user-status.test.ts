@@ -1,10 +1,10 @@
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function open_set_user_status_modal(page: Page): Promise<void> {
     await page.click("#personal-menu");
-    await page.waitForSelector("#personal-menu-dropdown", {visible: true});
+    await page.waitForSelector("#personal-menu-dropdown", { visible: true });
     // We are using evaluate to click because it is very hard to detect if
     // the personal menu popover has opened.
     await page.evaluate(() => {
@@ -30,21 +30,21 @@ async function test_user_status(page: Page): Promise<void> {
     await page.waitForFunction(
         () => document.querySelector<HTMLInputElement>(".user-status")!.value === "",
     );
-    await page.waitForSelector(".status-emoji-wrapper .smiley-icon", {visible: true});
+    await page.waitForSelector(".status-emoji-wrapper .smiley-icon", { visible: true });
 
     // Manually adding everything.
     await page.type(".user-status", "Busy");
     const laughing_emoji_selector = ".emoji-1f606";
     await page.click(".status-emoji-wrapper .smiley-icon");
     // Wait until emoji popover is opened.
-    await page.waitForSelector(`.emoji-popover ${laughing_emoji_selector}`, {visible: true});
+    await page.waitForSelector(`.emoji-popover ${laughing_emoji_selector}`, { visible: true });
     await page.click(`.emoji-popover  ${laughing_emoji_selector}`);
-    await page.waitForSelector(".emoji-picker-popover", {hidden: true});
+    await page.waitForSelector(".emoji-picker-popover", { hidden: true });
     await page.waitForSelector(`.selected-emoji${laughing_emoji_selector}`);
 
     await page.click("#set-user-status-modal .dialog_submit_button");
     // It should close the modal after saving.
-    await page.waitForSelector("#set-user-status-modal", {hidden: true});
+    await page.waitForSelector("#set-user-status-modal", { hidden: true });
 
     // Check if the emoji is added in user presence list.
     await page.waitForSelector(`.user-presence-link .status-emoji${laughing_emoji_selector}`);

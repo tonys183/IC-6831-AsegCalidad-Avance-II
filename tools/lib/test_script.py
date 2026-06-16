@@ -95,24 +95,37 @@ def add_provision_check_override_param(parser: ArgumentParser) -> None:
 
 def find_js_test_files(test_dir: str, files: Iterable[str]) -> list[str]:
     test_files = []
+    
+    all_files = []
+    for root, _, filenames in os.walk(test_dir):
+        for name in filenames:
+            full_path = os.path.join(root, name)
+            rel_path = os.path.relpath(full_path, test_dir)
+            rel_path = rel_path.replace("\\", "/")
+            all_files.append(rel_path)
+
     for file in files:
-        file = min(
+        file = file.replace("\\", "/")
+        matched_rel_path = min(
             (
-                os.path.join(test_dir, file_name)
-                for file_name in os.listdir(test_dir)
-                if file_name.startswith(file)
+                rel_path
+                for rel_path in all_files
+                if rel_path.startswith(file) or rel_path.endswith(file)
             ),
             default=file,
         )
 
-        if not os.path.isfile(file):
+        matched_full_path = os.path.join(test_dir, matched_rel_path)
+
+        if not os.path.isfile(matched_full_path):
             raise Exception(f"Cannot find a matching file for '{file}' in '{test_dir}'")
 
-        test_files.append(os.path.abspath(file))
+        test_files.append(os.path.abspath(matched_full_path))
 
     if not test_files:
         test_files = sorted(
-            glob.glob(os.path.join(test_dir, "*.ts")) + glob.glob(os.path.join(test_dir, "*.js"))
+            glob.glob(os.path.join(test_dir, "**", "*.ts"), recursive=True) + 
+            glob.glob(os.path.join(test_dir, "**", "*.js"), recursive=True)
         )
 
     return test_files

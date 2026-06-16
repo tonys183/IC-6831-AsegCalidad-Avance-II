@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function trigger_edit_last_message(page: Page): Promise<void> {
     const msg = (await page.$$(".message-list .message_row")).at(-1);
@@ -11,13 +11,13 @@ async function trigger_edit_last_message(page: Page): Promise<void> {
     await msg.hover();
     const info = await page.waitForSelector(
         `#${CSS.escape(id)} .message_control_button.actions_hover`,
-        {visible: true},
+        { visible: true },
     );
     assert.ok(info !== null);
     await info.click();
-    await page.waitForSelector(".popover_edit_message", {visible: true});
+    await page.waitForSelector(".popover_edit_message", { visible: true });
     await page.click(".popover_edit_message");
-    await page.waitForSelector(".message_edit_content", {visible: true});
+    await page.waitForSelector(".message_edit_content", { visible: true });
 }
 
 async function edit_stream_message(page: Page, content: string): Promise<void> {
@@ -106,7 +106,7 @@ async function edit_tests(page: Page): Promise<void> {
     const message_list_id = await common.get_current_msg_list_id(page, true);
     await page.waitForSelector(
         `.message-list[data-message-list-id='${message_list_id}'] .message_row`,
-        {visible: true},
+        { visible: true },
     );
 
     await test_stream_message_edit(page);

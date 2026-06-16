@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 async function test_mention(page: Page): Promise<void> {
     await common.log_in(page);
@@ -10,10 +10,10 @@ async function test_mention(page: Page): Promise<void> {
     let message_list_id = await common.get_current_msg_list_id(page, true);
     await page.waitForSelector(
         `.message-list[data-message-list-id='${message_list_id}'] .message_row`,
-        {visible: true},
+        { visible: true },
     );
     await page.keyboard.press("KeyC");
-    await page.waitForSelector("#compose", {visible: true});
+    await page.waitForSelector("#compose", { visible: true });
 
     await common.select_stream_in_compose_via_dropdown(page, "Verona");
     await common.fill_form(page, 'form[action^="/json/messages"]', {
@@ -35,10 +35,10 @@ async function test_mention(page: Page): Promise<void> {
 
     await page.waitForSelector(
         "#compose_banners .wildcard_warning .main-view-banner-action-button",
-        {visible: true},
+        { visible: true },
     );
     await page.click("#compose_banners .wildcard_warning .main-view-banner-action-button");
-    await page.waitForSelector(".wildcard_warning", {hidden: true});
+    await page.waitForSelector(".wildcard_warning", { hidden: true });
 
     message_list_id = await common.get_current_msg_list_id(page, true);
     await common.check_messages_sent(page, message_list_id, [

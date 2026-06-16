@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 
-import type {Page} from "puppeteer";
+import type { Page } from "puppeteer";
 
-import * as common from "./lib/common.ts";
+import * as common from "../lib/common.ts";
 
 type Playground = {
     playground_name: string;
@@ -11,7 +11,7 @@ type Playground = {
 };
 
 async function _add_playground_and_return_status(page: Page, payload: Playground): Promise<string> {
-    await page.waitForSelector(".admin-playground-form", {visible: true});
+    await page.waitForSelector(".admin-playground-form", { visible: true });
     const admin_playground_status_selector = "div#admin-playground-status";
 
     await common.select_item_via_typeahead(
@@ -33,10 +33,10 @@ async function _add_playground_and_return_status(page: Page, payload: Playground
     });
 
     // Wait for the request to complete by checking when the button is re-enabled.
-    await page.waitForSelector("button#submit_playground_button:not([disabled])", {visible: true});
+    await page.waitForSelector("button#submit_playground_button:not([disabled])", { visible: true });
 
     // We return the success/failure status message back to the caller.
-    await page.waitForSelector(admin_playground_status_selector, {visible: true});
+    await page.waitForSelector(admin_playground_status_selector, { visible: true });
     const admin_playground_status = await common.get_text_from_selector(
         page,
         admin_playground_status_selector,
@@ -52,7 +52,7 @@ async function test_successful_playground_creation(page: Page): Promise<void> {
     };
     const status = await _add_playground_and_return_status(page, payload);
     assert.strictEqual(status, "Custom playground added!");
-    await page.waitForSelector(".playground_row", {visible: true});
+    await page.waitForSelector(".playground_row", { visible: true });
     assert.strictEqual(
         await common.get_text_from_selector(
             page,
@@ -86,14 +86,14 @@ async function test_invalid_playground_parameters(page: Page): Promise<void> {
 }
 
 async function test_successful_playground_deletion(page: Page): Promise<void> {
-    await page.waitForSelector(".playground_row button.delete", {visible: true});
+    await page.waitForSelector(".playground_row button.delete", { visible: true });
     await page.click(".playground_row button.delete");
 
     await common.wait_for_micromodal_to_open(page);
     await page.click("#confirm_delete_code_playgrounds_modal .dialog_submit_button");
     await common.wait_for_micromodal_to_close(page);
 
-    await page.waitForSelector(".playground_row", {hidden: true});
+    await page.waitForSelector(".playground_row", { hidden: true });
 }
 
 async function playground_test(page: Page): Promise<void> {
