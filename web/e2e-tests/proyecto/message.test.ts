@@ -39,6 +39,8 @@ const selectors = {
     ERROR_TOKEN: "pre code .err, .codehilite .err",
 
     MATH: ".katex",
+    MATH_OR_ERROR: ".katex, .katex-error, .tex-error",
+    MATH_ERROR: ".katex-error, .tex-error",
 };
 
 const messages = {
@@ -47,6 +49,25 @@ const messages = {
     EXPECTED_FORMAT: (format: string) => `The last message must be rendered with ${format} format.`,
     EXPECTED_PLAIN_TEXT: (content: string) => `The last message must be rendered as plain text and not as a link: ${content}`,
 };
+
+type MessageTestCase = {
+    name: string;
+    test_function: (page: Page) => Promise<void>;
+};
+
+type MessageTestResult = {
+    name: string;
+    passed: boolean;
+    error?: unknown;
+};
+
+function format_error(error: unknown): string {
+    if (error instanceof Error) {
+        return error.stack ?? error.message;
+    }
+
+    return String(error);
+}
 
 function normalize_text(text: string): string {
     return text.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
@@ -226,6 +247,24 @@ async function has_element(page: Page, inner_selector: string): Promise<boolean>
 
             return last_message.querySelector(selector) !== null;
         },
+        selectors.MESSAGE_CONTENT,
+        inner_selector,
+    );
+}
+
+async function wait_until_last_message_has_element(page: Page, inner_selector: string): Promise<void> {
+    await page.waitForFunction(
+        (message_selector, selector) => {
+            const messages_list = Array.from(document.querySelectorAll(message_selector));
+            const last_message = messages_list.at(-1);
+
+            if (last_message === undefined) {
+                return false;
+            }
+
+            return last_message.querySelector(selector) !== null;
+        },
+        {timeout: 10000},
         selectors.MESSAGE_CONTENT,
         inner_selector,
     );
@@ -437,26 +476,7 @@ async function test_msg_015_send_incomplete_code_block_message(page: Page): Prom
         "print",
     );
 
-    await page.waitForFunction(
-        (message_selector) => {
-            const messages_list = Array.from(document.querySelectorAll(message_selector));
-            const last_message = messages_list.at(-1);
-
-            if (last_message === undefined) {
-                return false;
-            }
-
-            const code_element = last_message.querySelector("code");
-
-            if (code_element === null) {
-                return false;
-            }
-
-            return code_element.querySelector("span.err") !== null;
-        },
-        {timeout: 10000},
-        selectors.MESSAGE_CONTENT,
-    );
+    await wait_until_last_message_has_element(page, selectors.ERROR_TOKEN);
 
     assert.ok(
         code_block_exists,
@@ -480,13 +500,25 @@ async function test_msg_016_send_valid_math_message(page: Page): Promise<void> {
 async function test_msg_017_send_invalid_math_message(page: Page): Promise<void> {
     await send_compose_message(page, test_data.INVALID_MATH_MESSAGE, "25");
 
-    const math_exists = await contains_text(
+    const math_or_error_exists = await contains_text(
         page,
-        selectors.MATH,
+        selectors.MATH_OR_ERROR,
         "25",
     );
 
-    assert.ok(math_exists, messages.EXPECTED_FORMAT("incomplete math rendered as math"));
+    assert.ok(
+        math_or_error_exists,
+        messages.EXPECTED_FORMAT("incomplete math rendered as math or math error"),
+    );
+
+    await wait_until_last_message_has_element(page, selectors.MATH_ERROR);
+
+    const math_error_exists = await has_element(page, selectors.MATH_ERROR);
+
+    assert.ok(
+        math_error_exists,
+        messages.EXPECTED_FORMAT("incomplete math with error token"),
+    );
 }
 
 async function test_msg_018_send_emoji_message(page: Page): Promise<void> {
@@ -521,7 +553,7 @@ async function run_test_case(
 
         await run_message_test(test_page, test_function);
     } catch (error) {
-        console.error(`Falló el test ${test_name}`);
+        console.error(`Test ${test_name} has failed with error: ${format_error(error)}`);
         throw error;
     } finally {
         if (!test_page.isClosed()) {
@@ -535,141 +567,62 @@ async function message_tests(page: Page): Promise<void> {
 
     const home_url = page.url();
 
-    // test MSG-001
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-001",
-        test_msg_001_send_simple_text_message,
-    );
+    const test_cases: MessageTestCase[] = [
+        {name: "MSG-001", test_function: test_msg_001_send_simple_text_message},
+        {name: "MSG-002", test_function: test_msg_002_send_special_characters_message},
+        {name: "MSG-003", test_function: test_msg_003_send_bold_message},
+        {name: "MSG-004", test_function: test_msg_004_send_italic_message},
+        {name: "MSG-005", test_function: test_msg_005_reject_empty_message},
+        {name: "MSG-006", test_function: test_msg_006_reject_blank_message},
+        {name: "MSG-008", test_function: test_msg_008_send_ordered_list_message},
+        {name: "MSG-009", test_function: test_msg_009_send_bullet_list_message},
+        {name: "MSG-010", test_function: test_msg_010_send_long_message},
+        {name: "MSG-011", test_function: test_msg_011_send_valid_link_message},
+        {name: "MSG-012", test_function: test_msg_012_send_invalid_link_message},
+        {name: "MSG-013", test_function: test_msg_013_send_quote_message},
+        {name: "MSG-014", test_function: test_msg_014_send_code_block_message},
+        {name: "MSG-015", test_function: test_msg_015_send_incomplete_code_block_message},
+        {name: "MSG-016", test_function: test_msg_016_send_valid_math_message},
+        {name: "MSG-017", test_function: test_msg_017_send_invalid_math_message},
+        {name: "MSG-018", test_function: test_msg_018_send_emoji_message},
+    ];
 
-    // test MSG-002
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-002",
-        test_msg_002_send_special_characters_message,
-    );
+    const results: MessageTestResult[] = [];
 
-    // test MSG-003
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-003",
-        test_msg_003_send_bold_message,
-    );
+    for (const test_case of test_cases) {
+        try {
+            await run_test_case(
+                page,
+                home_url,
+                test_case.name,
+                test_case.test_function,
+            );
 
-    // test MSG-004
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-004",
-        test_msg_004_send_italic_message,
-    );
+            results.push({name: test_case.name, passed: true});
+            console.log(`Test ${test_case.name} has passed`);
+        } catch (error) {
+            results.push({name: test_case.name, passed: false, error});
+            console.error(`Continuing after failure in test ${test_case.name}`);
+        }
+    }
 
-    // test MSG-005
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-005",
-        test_msg_005_reject_empty_message,
-    );
+    const passed_results = results.filter((result) => result.passed);
+    const failed_results = results.filter((result) => !result.passed);
 
-    // test MSG-006
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-006",
-        test_msg_006_reject_blank_message,
-    );
+    console.log("\nTest Summary");
+    console.log(`Passed (${passed_results.length}): ${passed_results.map((result) => result.name).join(", ") || "none"}`);
+    console.log(`Failed (${failed_results.length}): ${failed_results.map((result) => result.name).join(", ") || "none"}`);
 
-    // test MSG-008
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-008",
-        test_msg_008_send_ordered_list_message,
-    );
+    for (const failed_result of failed_results) {
+        console.error(`\n${failed_result.name}: ${format_error(failed_result.error)}`);
+    }
 
-    // test MSG-009
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-009",
-        test_msg_009_send_bullet_list_message,
-    );
-
-    // test MSG-010
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-010",
-        test_msg_010_send_long_message,
-    );
-
-    // test MSG-011
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-011",
-        test_msg_011_send_valid_link_message,
-    );
-
-    // test MSG-012
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-012",
-        test_msg_012_send_invalid_link_message,
-    );
-
-    // test MSG-013
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-013",
-        test_msg_013_send_quote_message,
-    );
-
-    // test MSG-014
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-014",
-        test_msg_014_send_code_block_message,
-    );
-
-    // test MSG-015
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-015",
-        test_msg_015_send_incomplete_code_block_message,
-    );
-
-    // test MSG-016
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-016",
-        test_msg_016_send_valid_math_message,
-    );
-
-    // test MSG-017
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-017",
-        test_msg_017_send_invalid_math_message,
-    );
-
-    // test MSG-018
-    await run_test_case(
-        page,
-        home_url,
-        "MSG-018",
-        test_msg_018_send_emoji_message,
+    assert.strictEqual(
+        failed_results.length,
+        0,
+        `Failed: (${failed_results.length}): ${failed_results.map((result) => result.name).join(", ")}`,
     );
 }
+
 
 await common.run_test(message_tests);
